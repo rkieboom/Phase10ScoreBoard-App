@@ -8,7 +8,9 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var isStarted = false;
+    @State private var isStarted: Bool = false;
+    @State var dataExists: Bool = false
+    @State var object: [User] = []
     var body: some View {
         NavigationStack {
             ZStack {
@@ -32,16 +34,7 @@ struct ContentView: View {
                             .foregroundColor(Color.red)
                             .font(.custom("AmericanTypewriter", size: 45))
                     })
-                    Button(action: {
-                        guard let encodedData = UserDefaults.standard.data(forKey: "Players")
-                        else {
-                            return
-                        }
-                        let object = try? JSONDecoder().decode([User].self, from: encodedData)
-                        if (object == nil) {
-                            return
-                        }
-                    }, label: {
+                    NavigationLink(destination: GamePages(myUsers: self.$object), label: {
                         Text("Load game")
                             .padding()
                             .padding(.leading, 10)
@@ -52,24 +45,25 @@ struct ContentView: View {
                             .foregroundColor(Color.red)
                             .font(.custom("AmericanTypewriter", size: 45))
                     })
+                        .disabled(dataExists == false)
                     Spacer()
                     Spacer()
-                    
-                    //                    Button(action: {
-                    //                        isStarted = true;
-                    //                    }, label: {Text("Start").font(.system(size: 36))})
-                    //                    .foregroundColor(.white)
-                    //                    .fontWeight(.bold)
                 }
             }
         }
+        .onAppear {
+            loadGame()
+        }
     }
-    func startNewGame() {
-        
-    }
-    
     func loadGame() {
-        
+        guard let encodedData = UserDefaults.standard.data(forKey: "Players") else {
+            return
+        }
+        let tempObject: [User]? = try? JSONDecoder().decode([User].self, from: encodedData)
+        if (tempObject != nil) {
+            dataExists = true
+            self.object = (tempObject! as [User])
+        }
     }
 }
 
