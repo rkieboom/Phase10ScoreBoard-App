@@ -55,9 +55,6 @@ struct ScoreBoard: View {
                 Spacer()
             }.padding(.top, 25)
         }
-        .onAppear {
-//            self.myUsers = myUsers.map { $0 }
-        }
     }
 }
 
@@ -122,13 +119,15 @@ struct AddScore: View {
                 if (ret == 0) {
                     for i in 0..<self.myUsers.count {
                         myUsers[i].addScore(N: (addScore[i] as NSString).integerValue)
+//                        print("\(i). Score=\((addScore[i] as NSString).integerValue)")
                         addScore[i] = ""
-                        print(self.myUsers[i].getScore())
+//                        print(self.myUsers[i].getScore())
                     }
                     self.isFocused = false
                 }
 //                    hiddenTrigger.toggle()
                     self.myUsers = myUsers.map { $0 }
+                    saveData()
                 }, label: {
                     Text("Update")
                         .frame(width: 120, height: 50)
@@ -140,6 +139,11 @@ struct AddScore: View {
                 .padding(.bottom, 15)
             }
         }
+    }
+    
+    func saveData() {
+        let encoded = try? JSONEncoder().encode(self.myUsers)
+        UserDefaults().set(encoded, forKey: "Players")
     }
 }
 struct EditScore: View {

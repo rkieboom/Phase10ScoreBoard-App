@@ -7,7 +7,7 @@
 
 import Foundation
 
-class User {
+class User: Codable {
     public var name: String;
     private var score: Int = 0;
     private var phase: Int = 1;
@@ -33,6 +33,9 @@ class User {
     }
     
     func addScore(N: Int) {
+        if (N < 50) {
+            increasePhase()
+        }
         score += N;
     }
     

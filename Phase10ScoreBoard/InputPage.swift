@@ -17,7 +17,7 @@ struct InputPage: View {
     var body: some View {
         NavigationView {
             ZStack {
-                LinearGradient(gradient: Gradient(colors: [.red, .blue]), startPoint: .topLeading, endPoint: .bottomTrailing)
+                LinearGradient(gradient: Gradient(colors: [.red, .blue, .green, .yellow]), startPoint: .topLeading, endPoint: .bottomTrailing)
                     .ignoresSafeArea()
                 
                 
@@ -25,11 +25,13 @@ struct InputPage: View {
                     Image("masters-removebg-preview")
                         .resizable()
                         .aspectRatio(contentMode: .fit)
+                        .colorMultiply(.red)
+                        .shadow(radius: 10)
                     
                     Text("Choose amount of players:")
                         .font(.system(size: 30))
                         .bold()
-                        .foregroundColor(.white)
+                        .foregroundColor(.red)
                     Picker(selection: $selected, label: Text("Picker")) {
                         Text("2").tag(2)
                         Text("3").tag(3)
@@ -47,23 +49,48 @@ struct InputPage: View {
                             .autocorrectionDisabled()
                     }
                     Spacer()
-                    Button(action: {
+                    NavigationLink(destination: GamePages(myUsers: self.$myUsers), label: {
+                        Text("Start game")
+                            .disabled(userNamesCheck() != 0)
+                            .padding()
+                            .padding(.leading, 10)
+                            .padding(.trailing, 10)
+                            .background(Color.white)
+                            .cornerRadius(15.0)
+                            .shadow(radius: 10)
+                            .foregroundColor(Color.red)
+                            .font(.custom("AmericanTypewriter", size: 45))
+                            .onSubmit {
+                                print("This is a test!")
+                            }
+                    }).simultaneousGesture(TapGesture().onEnded({
                         for index in 0..<selected {
                             let newUser = User(name: self.names[index])
                             myUsers.append(newUser)
                         }
-                        self.start = true;
-
-                    }, label: {
-                        Text("Start")
-                            .foregroundColor(.white)
-                    })
-                    NavigationLink(isActive: $start, destination: {
-                        GamePages(myUsers: self.$myUsers)
-                    }, label: {})
+                    }))
+                    .disabled(userNamesCheck() != 0)
                 }
             }
         }
+    }
+    
+    func userNamesCheck() -> Int {
+        for i in 0..<selected {
+            if (self.names[i] == "") {
+                return 1
+            }
+            for j in 0..<selected {
+                if (i == j) {
+                    continue
+                }
+                if (self.names[i] == self.names[j]) {
+                    return 2
+                    
+                }
+            }
+        }
+        return 0
     }
 }
 
